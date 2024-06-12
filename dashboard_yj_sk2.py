@@ -112,51 +112,96 @@ selected_category = st.sidebar.selectbox('골목상권을 선택해주세요:', 
 # '선택하세요'가 아닌 유효한 지역이 선택된 경우에만 제목과 차트를 생성
 if selected_category != '선택해주세요':
     filtered_df = df[df['TYPE'] == selected_category]
-    filtered_df2_1 = df[df['TYPE'] == selected_category]
-    filtered_df2_1 = filtered_df2_1.sort_values(by='age')
-    ###   성별   #############################################################
-    # 원형 차트 생성
+    
+    ### 성별 #############################################################
     st.header('1. 기본 응답자 정보 확인')
     colors=['#800000', '#4776b4']
     fig = px.pie(
         filtered_df,
-        names='sex',            #sk 수정
-        values='count',         #sk 수정
-        title=f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 유동인구 남녀비율', color_discrete_sequence=colors)
+        names='sex',
+        values='count',
+        title=f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 유동인구 남녀비율', 
+        color_discrete_sequence=colors
+    )
     st.plotly_chart(fig)
-    # 텍스트 크기 조정
     fig.update_traces(textposition='inside', textinfo='percent+label', insidetextfont=dict(size=18))
-    ###   연령대(10세 단위)   #############################################################
+
+    ### 연령대(10세 단위) #############################################################
+    # 연령대별 데이터 집계
+    age_grouped = filtered_df.groupby('age')['count'].sum().reset_index()
+    age_grouped['sum_count'] = age_grouped['count']
+    
     colors = ['#6ccad0']
     fig2_1 = go.Figure(go.Bar(
-    x=filtered_df2_1['age'],
-    y=filtered_df2_1['count'],
-    name='연령대(10세 단위)'))
+        x=age_grouped['age'],
+        y=age_grouped['sum_count'],
+        name='연령대(10세 단위)'
+    ))
 
-    fig2_1.update_layout(width=800, height=400, title_text=f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 유동인구 연령대비율')
+    fig2_1.update_traces(
+        hovertemplate='연령대: %{x}<br>유동인구수 합계: %{y}<extra></extra>'
+    )
+    
+    fig2_1.update_layout(
+        width=800, 
+        height=400, 
+        title_text=f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 유동인구 연령대비율'
+    )
     st.plotly_chart(fig2_1)
+
     
 ###############################################################################
 # 2. 골목상권별 시간대 분포
 
 # 사이드바에 드롭다운 메뉴 생성
 st.sidebar.header('2. 골목상권별 시간대/요일별 분포')
-#options2 = ['선택해주세요'] + list(merged_df['RESC_CT_NM'].unique())
-#selected_category2 = st.sidebar.selectbox('세부 지역을 선택해주세요:', options=options2, key='unique_selectbox_key')
 if selected_category != '선택해주세요':
     st.header('2. 골목상권별 시간대/요일별 분포')
     filtered_df3_1 = filtered_df     #sk 수정
+    
+    # 시간대별 데이터 집계
+    time_grouped = filtered_df3_1.groupby('time')['count'].sum().reset_index()
+    time_grouped['sum_count'] = time_grouped['count']
+    
     # 시간대별 차트
-    fig3 = px.bar(filtered_df3_1, x='time', y='count', title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 시간대별 유동인구수')
-    fig3.update_layout(xaxis=dict(title='시간대', tickvals=df['time'], ticktext=df['time']), yaxis_title='유동인구수')
+    fig3 = px.bar(
+        time_grouped, 
+        x='time', 
+        y='sum_count', 
+        title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 시간대별 유동인구수',
+        hover_data={'sum_count': True}
+    )
+    fig3.update_traces(
+        hovertemplate='시간: %{x}<br>유동인구수 합계: %{y}<extra></extra>'
+    )
+    fig3.update_layout(
+        xaxis=dict(title='시간대', tickvals=filtered_df3_1['time'].unique(), ticktext=filtered_df3_1['time'].unique()),
+        yaxis_title='유동인구수'
+    )
     st.plotly_chart(fig3)
     
 if selected_category != '선택해주세요':
     filtered_df3_2 = filtered_df3_1     #sk 수정
-    # 일별 차트
-    filtered_df3_2 = filtered_df3_2.sort_values(by='Day_of_Week_Num')
-    fig4 = px.bar(filtered_df3_2, x='Day_of_Week', y='count', title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 일별 유동인구수 추이')
-    fig4.update_layout(xaxis_title='요일', yaxis_title='유동인구수')
+    
+    # 요일별 데이터 집계
+    day_grouped = filtered_df3_2.groupby('Day_of_Week')['count'].sum().reset_index()
+    day_grouped['sum_count'] = day_grouped['count']
+    
+    # 요일별 차트
+    fig4 = px.bar(
+        day_grouped, 
+        x='Day_of_Week', 
+        y='sum_count', 
+        title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 일별 유동인구수 추이',
+        hover_data={'sum_count': True}
+    )
+    fig4.update_traces(
+        hovertemplate='요일: %{x}<br>유동인구수 합계: %{y}<extra></extra>'
+    )
+    fig4.update_layout(
+        xaxis_title='요일', 
+        yaxis_title='유동인구수'
+    )
     st.plotly_chart(fig4)
 
 ###############################################################################
