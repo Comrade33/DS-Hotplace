@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
 ###############################################################################
-
+@st.cache_data
 def read_data(file_path):
     df = pd.read_excel(file_path, sheet_name='data')
     
