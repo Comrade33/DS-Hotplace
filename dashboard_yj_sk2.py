@@ -80,7 +80,13 @@ file_urls = [
 
 df = load_all_data(file_urls)
 # age 60대까지만 불러오기
-df = df[df['age'].isin(['10대', '20대', '30대', '40대', '50대', '60대'])]
+df = df[df['age'].isin(['10대', '20대', '30대', '40대', '50대', '60대'])
+
+# 5/3~5/9 데이터만 산출
+start_date = pd.to_datetime('20240503', format='%Y%m%d')
+end_date = pd.to_datetime('20240509', format='%Y%m%d')
+df = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
+
 ###############################################################################
 
 #한글 폰트 설정
