@@ -109,8 +109,8 @@ if selected_category != '선택해주세요':
     colors=['#800000', '#4776b4']
     fig = px.pie(
         filtered_df,
-        names=df['sex'],
-        values=df['count'],
+        names='sex',            #sk 수정
+        values='count',         #sk 수정
         title=f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 유동인구 남녀비율', color_discrete_sequence=colors)
     st.plotly_chart(fig)
     # 텍스트 크기 조정
@@ -134,14 +134,14 @@ st.sidebar.header('2. 골목상권별 시간대/요일별 분포')
 #selected_category2 = st.sidebar.selectbox('세부 지역을 선택해주세요:', options=options2, key='unique_selectbox_key')
 if selected_category != '선택해주세요':
     st.header('2. 골목상권별 시간대/요일별 분포')
-    filtered_df3_1 = df[df['TYPE'] == selected_category]
+    filtered_df3_1 = filtered_df     #sk 수정
     # 시간대별 차트
     fig3 = px.bar(filtered_df3_1, x='time', y='count', title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 시간대별 유동인구수')
     fig3.update_layout(xaxis=dict(title='시간대', tickvals=df['time'], ticktext=df['time']), yaxis_title='유동인구수')
     st.plotly_chart(fig3)
     
 if selected_category != '선택해주세요':
-    filtered_df3_2 = df[df['TYPE'] == selected_category]
+    filtered_df3_2 = filtered_df3_1     #sk 수정
     # 일별 차트
     filtered_df3_2 = filtered_df3_2.sort_values(by='Day_of_Week_Num')
     fig4 = px.bar(filtered_df3_2, x='Day_of_Week', y='count', title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 일별 유동인구수 추이')
