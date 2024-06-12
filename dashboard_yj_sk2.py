@@ -139,7 +139,7 @@ if selected_category != '선택해주세요':
     ))
 
     fig2_1.update_traces(
-        hovertemplate='연령대: %{x}<br>유동인구수 합계: %{y}<extra></extra>'
+        hovertemplate='연령대: %{x}<br>유동인구수 합계: %{y:,}<extra></extra>'
     )
     
     fig2_1.update_layout(
@@ -172,7 +172,7 @@ if selected_category != '선택해주세요':
         hover_data={'sum_count': True}
     )
     fig3.update_traces(
-        hovertemplate='시간: %{x}<br>유동인구수 합계: %{y}<extra></extra>'
+        hovertemplate='시간: %{x}<br>유동인구수 합계: %{y:,}<extra></extra>'
     )
     fig3.update_layout(
         xaxis=dict(title='시간대', tickvals=filtered_df3_1['time'].unique(), ticktext=filtered_df3_1['time'].unique()),
@@ -196,7 +196,7 @@ if selected_category != '선택해주세요':
         hover_data={'sum_count': True}
     )
     fig4.update_traces(
-        hovertemplate='요일: %{x}<br>유동인구수 합계: %{y}<extra></extra>'
+        hovertemplate='요일: %{x}<br>유동인구수 합계: %{y:,}<extra></extra>'
     )
     fig4.update_layout(
         xaxis_title='요일', 
