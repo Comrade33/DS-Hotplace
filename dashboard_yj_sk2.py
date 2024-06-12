@@ -6,6 +6,11 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
 ###############################################################################
+# 배경 검정색으로 바꾸기
+backgroundColor = "#131e35"
+# 꽉찬 화면으로 바꾸기
+st.set_page_config(layout="wide")
+###############################################################################
 
 @st.cache_data
 def read_data(file_path):
@@ -81,11 +86,6 @@ df = load_all_data(file_urls)
 plt.rcParams['font.family'] = 'NanumGothic'
 plt.rcParams['axes.unicode_minus'] = False
 
-###############################################################################
-# 배경 검정색으로 바꾸기
-backgroundColor = "#131e35"
-# 꽉찬 화면으로 바꾸기
-st.set_page_config(layout="wide")
 ###############################################################################
 
 # 제목
