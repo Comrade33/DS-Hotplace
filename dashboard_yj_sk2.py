@@ -214,7 +214,6 @@ if selected_category != '선택해주세요':
     st.plotly_chart(fig4)
 
 
-
 ###############################################################################
 #3-1. 주중
 
@@ -342,7 +341,7 @@ if selected_category != '선택해주세요':
     
     # 시간대별 데이터 집계
     filtered_df3_1_w2['time'] = pd.to_datetime(filtered_df3_1_w2['time'], format='%H:%M')
-    time_grouped_w2 = filtered_df3_1_w1.groupby('time')['count'].sum().reset_index()
+    time_grouped_w2 = filtered_df3_1_w2.groupby('time')['count'].sum().reset_index()
     time_grouped_w2['time'] = time_grouped_w2['time'].dt.strftime('%H:%M')
     time_grouped_w2['sum_count'] = time_grouped_w2['count']
     
@@ -358,7 +357,7 @@ if selected_category != '선택해주세요':
         hovertemplate='시간: %{x}<br>유동인구수 합계: %{y:,}<extra></extra>'
     )
     fig3.update_layout(
-        xaxis=dict(title='시간대', tickvals=time_grouped_w1['time'], ticktext=time_grouped_w1['time']),
+        xaxis=dict(title='시간대', tickvals=time_grouped_w2['time'], ticktext=time_grouped_w2['time']),
         yaxis=dict(title='유동인구수', tickformat=',')
     )
     st.plotly_chart(fig3)
