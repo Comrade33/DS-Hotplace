@@ -196,7 +196,7 @@ if selected_category != '선택해주세요':
         day_grouped, 
         x='Day_of_Week', 
         y='sum_count', 
-        title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 일별 유동인구수 추이',
+        title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 요일별 유동인구수 추이',
         hover_data={'sum_count': ':,'}  # 추가: 숫자 형식 지정
     )
     fig4.update_traces(
