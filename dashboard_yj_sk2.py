@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 
 ###############################################################################
+
 @st.cache_data
 def read_data(file_path):
     df = pd.read_excel(file_path, sheet_name='data')
@@ -56,6 +57,14 @@ def read_data(file_path):
     
     return df
 
+@st.cache_data
+def load_all_data(file_urls):
+    all_data = []
+    for file_url in file_urls:
+        df = read_data(file_url)
+        all_data.append(df)
+    return pd.concat(all_data, ignore_index=True)
+
 file_urls = [
     'https://github.com/Comrade33/DS-Hotplace/raw/main/total_data_1.xlsx',
     'https://github.com/Comrade33/DS-Hotplace/raw/main/total_data_2.xlsx',
@@ -64,12 +73,7 @@ file_urls = [
     'https://github.com/Comrade33/DS-Hotplace/raw/main/total_data_5.xlsx'
 ]
 
-all_data = []
-for file_url in file_urls:
-    df = read_data(file_url)
-    all_data.append(df)
-
-df = pd.concat(all_data, ignore_index=True)
+df = load_all_data(file_urls)
 
 ###############################################################################
 
