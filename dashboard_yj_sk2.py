@@ -145,7 +145,8 @@ if selected_category != '선택해주세요':
     fig2_1.update_layout(
         width=800, 
         height=400, 
-        title_text=f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 유동인구 연령대비율'
+        title_text=f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 유동인구 연령대비율',
+        yaxis=dict(tickformat=',')  # y축 형식 지정
     )
     st.plotly_chart(fig2_1)
 
@@ -169,10 +170,10 @@ if selected_category != '선택해주세요':
         x='time', 
         y='sum_count', 
         title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 시간대별 유동인구수',
-        hover_data={'sum_count': True}
+        hover_data={'sum_count': ':,'}  # 추가: 숫자 형식 지정
     )
     fig3.update_traces(
-        hovertemplate='시간: %{x}<br>유동인구수 합계: %{y:,}<extra></extra>'
+        hovertemplate='시간: %{x}<br>유동인구수 합계: %{y}<extra></extra>'
     )
     fig3.update_layout(
         xaxis=dict(title='시간대', tickvals=filtered_df3_1['time'].unique(), ticktext=filtered_df3_1['time'].unique()),
@@ -193,10 +194,10 @@ if selected_category != '선택해주세요':
         x='Day_of_Week', 
         y='sum_count', 
         title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 일별 유동인구수 추이',
-        hover_data={'sum_count': True}
+        hover_data={'sum_count': ':,'}  # 추가: 숫자 형식 지정
     )
     fig4.update_traces(
-        hovertemplate='요일: %{x}<br>유동인구수 합계: %{y:,}<extra></extra>'
+        hovertemplate='요일: %{x}<br>유동인구수 합계: %{y}<extra></extra>'
     )
     fig4.update_layout(
         xaxis_title='요일', 
