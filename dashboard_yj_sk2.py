@@ -87,6 +87,10 @@ start_date = pd.to_datetime('20240503', format='%Y%m%d')
 end_date = pd.to_datetime('20240509', format='%Y%m%d')
 df = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
 
+# 주중, 주말로 나누기
+df_w1 = df[df['Day_of_Week_Num'].between(1, 4)]
+df_w2 = df[df['Day_of_Week_Num'].between(5, 7)]
+
 ###############################################################################
 
 #한글 폰트 설정
@@ -196,7 +200,7 @@ if selected_category != '선택해주세요':
         day_grouped, 
         x='Day_of_Week', 
         y='sum_count', 
-        title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 요일별 유동인구수 추이',
+        title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 요일별 유동인구수',
         hover_data={'sum_count': ':,'}  # 추가: 숫자 형식 지정
     )
     fig4.update_traces(
@@ -208,3 +212,153 @@ if selected_category != '선택해주세요':
         xaxis=dict(categoryorder='array', categoryarray=['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'])
     )
     st.plotly_chart(fig4)
+
+
+
+###############################################################################
+#3-1. 주중
+
+# '선택하세요'가 아닌 유효한 지역이 선택된 경우에만 제목과 차트를 생성
+if selected_category != '선택해주세요':
+    filtered_df_w1 = df_w1[df_w1['TYPE'] == selected_category]
+    
+    ### 성별 #############################################################
+    st.header('3-1. 주중(월~목)')
+    colors=['#800000', '#4776b4']
+    fig = px.pie(
+        filtered_df_w1,
+        names='sex',
+        values='count',
+        title=f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 유동인구 남녀비율 - 주중(월~목)', 
+        color_discrete_sequence=colors
+    )
+    st.plotly_chart(fig)
+    fig.update_traces(textposition='inside', textinfo='percent+label', insidetextfont=dict(size=18))
+
+    ### 연령대(10세 단위) #############################################################
+    # 연령대별 데이터 집계
+    age_grouped_w1 = filtered_df_w1.groupby('age')['count'].sum().reset_index()
+    age_grouped_w1['sum_count'] = age_grouped_w1['count']
+    
+    colors = ['#6ccad0']
+    fig2_1 = go.Figure(go.Bar(
+        x=age_grouped_w1['age'],
+        y=age_grouped_w1['sum_count'],
+        name='연령대(10세 단위)'
+    ))
+
+    fig2_1.update_traces(
+        hovertemplate='연령대: %{x}<br>유동인구수 합계: %{y:,}<extra></extra>'
+    )
+    
+    fig2_1.update_layout(
+        width=800, 
+        height=400, 
+        title_text=f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 유동인구 연령대비율 - 주중(월~목)',
+        yaxis=dict(tickformat=',')  # y축 형식 지정
+    )
+    st.plotly_chart(fig2_1)
+
+    
+###############################################################################
+# 2. 골목상권별 시간대 분포
+
+if selected_category != '선택해주세요':
+    filtered_df3_1_w1 = filtered_df_w1  # sk 수정
+    
+    # 시간대별 데이터 집계
+    filtered_df3_1_w1['time'] = pd.to_datetime(filtered_df3_1_w1['time'], format='%H:%M')
+    time_grouped_w1 = filtered_df3_1_w1.groupby('time')['count'].sum().reset_index()
+    time_grouped_w1['time'] = time_grouped_w1['time'].dt.strftime('%H:%M')
+    time_grouped_w1['sum_count'] = time_grouped_w1['count']
+    
+    # 시간대별 차트
+    fig3 = px.bar(
+        time_grouped_w1,
+        x='time',
+        y='sum_count',
+        title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 시간대별 유동인구수 - 주중(월~목)',
+        hover_data={'sum_count': ':,'}  # 추가: 숫자 형식 지정
+    )
+    fig3.update_traces(
+        hovertemplate='시간: %{x}<br>유동인구수 합계: %{y:,}<extra></extra>'
+    )
+    fig3.update_layout(
+        xaxis=dict(title='시간대', tickvals=time_grouped_w1['time'], ticktext=time_grouped_w1['time']),
+        yaxis=dict(title='유동인구수', tickformat=',')
+    )
+    st.plotly_chart(fig3)
+
+###############################################################################
+#3-1. 주말
+
+# '선택하세요'가 아닌 유효한 지역이 선택된 경우에만 제목과 차트를 생성
+if selected_category != '선택해주세요':
+    filtered_df_w2 = df_w2[df_w2['TYPE'] == selected_category]
+    
+    ### 성별 #############################################################
+    st.header('3-2. 주말(금~일)')
+    colors=['#800000', '#4776b4']
+    fig = px.pie(
+        filtered_df_w2,
+        names='sex',
+        values='count',
+        title=f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 유동인구 남녀비율 - 주말(금~일)', 
+        color_discrete_sequence=colors
+    )
+    st.plotly_chart(fig)
+    fig.update_traces(textposition='inside', textinfo='percent+label', insidetextfont=dict(size=18))
+
+    ### 연령대(10세 단위) #############################################################
+    # 연령대별 데이터 집계
+    age_grouped_w2 = filtered_df_w2.groupby('age')['count'].sum().reset_index()
+    age_grouped_w2['sum_count'] = age_grouped_w2['count']
+    
+    colors = ['#6ccad0']
+    fig2_1 = go.Figure(go.Bar(
+        x=age_grouped_w2['age'],
+        y=age_grouped_w2['sum_count'],
+        name='연령대(10세 단위)'
+    ))
+
+    fig2_1.update_traces(
+        hovertemplate='연령대: %{x}<br>유동인구수 합계: %{y:,}<extra></extra>'
+    )
+    
+    fig2_1.update_layout(
+        width=800, 
+        height=400, 
+        title_text=f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 유동인구 연령대비율 - 주말(금~일)',
+        yaxis=dict(tickformat=',')  # y축 형식 지정
+    )
+    st.plotly_chart(fig2_1)
+
+    
+###############################################################################
+# 2. 골목상권별 시간대 분포
+
+if selected_category != '선택해주세요':
+    filtered_df3_1_w2 = filtered_df_w2  # sk 수정
+    
+    # 시간대별 데이터 집계
+    filtered_df3_1_w2['time'] = pd.to_datetime(filtered_df3_1_w2['time'], format='%H:%M')
+    time_grouped_w2 = filtered_df3_1_w1.groupby('time')['count'].sum().reset_index()
+    time_grouped_w2['time'] = time_grouped_w2['time'].dt.strftime('%H:%M')
+    time_grouped_w2['sum_count'] = time_grouped_w2['count']
+    
+    # 시간대별 차트
+    fig3 = px.bar(
+        time_grouped_w2,
+        x='time',
+        y='sum_count',
+        title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 시간대별 유동인구수 - 주말(금~일)',
+        hover_data={'sum_count': ':,'}  # 추가: 숫자 형식 지정
+    )
+    fig3.update_traces(
+        hovertemplate='시간: %{x}<br>유동인구수 합계: %{y:,}<extra></extra>'
+    )
+    fig3.update_layout(
+        xaxis=dict(title='시간대', tickvals=time_grouped_w1['time'], ticktext=time_grouped_w1['time']),
+        yaxis=dict(title='유동인구수', tickformat=',')
+    )
+    st.plotly_chart(fig3)
