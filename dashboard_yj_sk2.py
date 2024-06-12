@@ -12,7 +12,7 @@ backgroundColor = "#131e35"
 st.set_page_config(layout="wide")
 ###############################################################################
 
-@st.cache_data
+# @st.cache_data
 def read_data(file_path):
     df = pd.read_excel(file_path, sheet_name='data')
     
@@ -65,7 +65,7 @@ def read_data(file_path):
 
     return df
 
-@st.cache_data
+# @st.cache_data
 def load_all_data(file_urls):
     all_data = []
     for file_url in file_urls:
