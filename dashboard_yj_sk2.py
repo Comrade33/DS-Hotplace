@@ -12,7 +12,7 @@ backgroundColor = "#131e35"
 st.set_page_config(layout="wide")
 ###############################################################################
 
-# @st.cache_data
+@st.cache_data
 def read_data(file_path):
     df = pd.read_excel(file_path, sheet_name='data')
     
@@ -60,12 +60,9 @@ def read_data(file_path):
     type_mapping = { 1:'수원 행리단길', 2: '경주 황리단길', 3: '부산 해리단길', 4: '서울 망리단길', 5:'서울 서울숲길' }
     df['TYPE'] = df['TYPE'].map(type_mapping)
 
-    # age 60대까지만 불러오기
-    df = df[df['age'].isin(['10대', '20대', '30대', '40대', '50대', '60대'])]
-
     return df
 
-# @st.cache_data
+@st.cache_data
 def load_all_data(file_urls):
     all_data = []
     for file_url in file_urls:
@@ -82,7 +79,8 @@ file_urls = [
 ]
 
 df = load_all_data(file_urls)
-
+# age 60대까지만 불러오기
+df = df[df['age'].isin(['10대', '20대', '30대', '40대', '50대', '60대'])]
 ###############################################################################
 
 #한글 폰트 설정
