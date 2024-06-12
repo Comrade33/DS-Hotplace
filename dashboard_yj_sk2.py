@@ -158,34 +158,37 @@ if selected_category != '선택해주세요':
 st.sidebar.header('2. 골목상권별 시간대/요일별 분포')
 if selected_category != '선택해주세요':
     st.header('2. 골목상권별 시간대/요일별 분포')
-    filtered_df3_1 = filtered_df     #sk 수정
+    filtered_df3_1 = filtered_df  # sk 수정
     
     # 시간대별 데이터 집계
+    filtered_df3_1['time'] = pd.to_datetime(filtered_df3_1['time'], format='%H:%M')
     time_grouped = filtered_df3_1.groupby('time')['count'].sum().reset_index()
+    time_grouped['time'] = time_grouped['time'].dt.strftime('%H:%M')
     time_grouped['sum_count'] = time_grouped['count']
     
     # 시간대별 차트
     fig3 = px.bar(
-        time_grouped, 
-        x='time', 
-        y='sum_count', 
+        time_grouped,
+        x='time',
+        y='sum_count',
         title=f'<span style="color:blue; font-weight:bold">{selected_category}</span> 시간대별 유동인구수',
         hover_data={'sum_count': ':,'}  # 추가: 숫자 형식 지정
     )
     fig3.update_traces(
-        hovertemplate='시간: %{x}<br>유동인구수 합계: %{y}<extra></extra>'
+        hovertemplate='시간: %{x}<br>유동인구수 합계: %{y:,}<extra></extra>'
     )
     fig3.update_layout(
-        xaxis=dict(title='시간대', tickvals=filtered_df3_1['time'].unique(), ticktext=filtered_df3_1['time'].unique()),
-        yaxis_title='유동인구수'
+        xaxis=dict(title='시간대', tickvals=time_grouped['time'], ticktext=time_grouped['time']),
+        yaxis=dict(title='유동인구수', tickformat=',')
     )
     st.plotly_chart(fig3)
+
     
 if selected_category != '선택해주세요':
-    filtered_df3_2 = filtered_df3_1     #sk 수정
+    filtered_df3_2 = filtered_df3_1  # sk 수정
     
     # 요일별 데이터 집계
-    day_grouped = filtered_df3_2.groupby('Day_of_Week')['count'].sum().reset_index()
+    day_grouped = filtered_df3_2.groupby(['Day_of_Week', 'Day_of_Week_Num'])['count'].sum().reset_index()
     day_grouped['sum_count'] = day_grouped['count']
     
     # 요일별 차트
@@ -197,12 +200,11 @@ if selected_category != '선택해주세요':
         hover_data={'sum_count': ':,'}  # 추가: 숫자 형식 지정
     )
     fig4.update_traces(
-        hovertemplate='요일: %{x}<br>유동인구수 합계: %{y}<extra></extra>'
+        hovertemplate='요일: %{x}<br>유동인구수 합계: %{y:,}<extra></extra>'
     )
     fig4.update_layout(
         xaxis_title='요일', 
-        yaxis_title='유동인구수'
+        yaxis=dict(title='유동인구수', tickformat=','),
+        xaxis=dict(categoryorder='array', categoryarray=['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'])
     )
     st.plotly_chart(fig4)
-
-###############################################################################
