@@ -82,10 +82,14 @@ df = load_all_data(file_urls)
 # age 60대까지만 불러오기
 df = df[df['age'].isin(['10대', '20대', '30대', '40대', '50대', '60대'])]
 
-# 5/22~5/28 데이터만 산출
-#start_date = pd.to_datetime('20240522', format='%Y%m%d')
-#end_date = pd.to_datetime('20240528', format='%Y%m%d')
-#df = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
+# 5/3~5/9 데이터만 산출
+start_date = pd.to_datetime('20240522', format='%Y%m%d')
+end_date = pd.to_datetime('20240528', format='%Y%m%d')
+df = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
+
+# 주중, 주말로 나누기
+df_w1 = df[df['Day_of_Week_Num'].between(1, 4)]
+df_w2 = df[df['Day_of_Week_Num'].between(5, 7)]
 
 ###############################################################################
 
@@ -96,32 +100,8 @@ plt.rcParams['axes.unicode_minus'] = False
 ###############################################################################
 
 # 제목
-st.title("골목상권 유동인구 분석")
-#st.caption('골목상권 유동인구 대시보드')
-
-###############################################################################
-
-st.sidebar.header('분석 날짜 선택')
-options = ['선택해주세요'] + sorted(df['date'].astype(str).unique())
-start_date = st.sidebar.selectbox('시작 날짜를 선택해주세요.', options, key='selectbox0_1')
-end_date = st.sidebar.selectbox('종료 날짜를 선택해주세요.', options, key='selectbox0_2')
-
-if (start_date != '선택해주세요') and (end_date != '선택해주세요'):
-    start_date = datetime.strptime(start_date, '%Y-%m-%d')
-    end_date = datetime.strptime(end_date, '%Y-%m-%d')
-    if start_date > end_date:
-        st.sidebar.error('종료 날짜는 시작 날짜 이후여야 합니다.')
-else:
-    start_date = None
-    end_date = None
-
-# 날짜가 선택되었을 때만 데이터 필터링을 수행합니다.
-if start_date is not None and end_date is not None:
-    df = df[(df['date'] >= start_date) & (df['date'] <= end_date)]
-
-# 주중, 주말로 나누기
-df_w1 = df[df['Day_of_Week_Num'].between(1, 4)]
-df_w2 = df[df['Day_of_Week_Num'].between(5, 7)]
+st.title("골목상권 유동인구 분석 (24/05/22~24/05/28)")
+st.caption('골목상권 유동인구 대시보드')
 
 ###############################################################################
 #1. 기본 응답자 정보 확인
@@ -130,16 +110,14 @@ df_w2 = df[df['Day_of_Week_Num'].between(5, 7)]
 colors = ['#bd054e', '#0193bd']
 
 # 드롭다운 메뉴 생성
+st.sidebar.header('1. 기본 응답자 정보 확인')
 options = ['선택해주세요'] + list(df['TYPE'].unique())
 selected_category = st.sidebar.selectbox('골목상권을 선택해주세요:', options, key='selectbox1')
-st.sidebar.header('1. 기본 응답자 정보 확인')
 # '선택하세요'가 아닌 유효한 지역이 선택된 경우에만 제목과 차트를 생성
 if selected_category != '선택해주세요':
     filtered_df = df[df['TYPE'] == selected_category]
     
     ### 성별 #############################################################
-    date_range = f"({start_date.strftime('%Y-%m-%d')}~{end_date.strftime('%Y-%m-%d')})"
-    st.caption(f"분석 기간: {date_range}")
     st.header('1. 기본 응답자 정보 확인')
     colors=['#800000', '#4776b4']
     fig = px.pie(
@@ -240,7 +218,7 @@ if selected_category != '선택해주세요':
 #3-1. 주중
 
 # '선택하세요'가 아닌 유효한 지역이 선택된 경우에만 제목과 차트를 생성
-if (selected_category != '선택해주세요') and (not df_w1.empty):
+if selected_category != '선택해주세요':
     filtered_df_w1 = df_w1[df_w1['TYPE'] == selected_category]
     
 ### 성별 #############################################################
@@ -279,13 +257,12 @@ if (selected_category != '선택해주세요') and (not df_w1.empty):
         yaxis=dict(tickformat=',')  # y축 형식 지정
     )
     st.plotly_chart(fig2_1)
-elif (selected_category != '선택해주세요') and df_w1.empty:
-    st.header("3-1.주중(월~목)에 해당하는 데이터가 없습니다.")
+
     
 ###############################################################################
 # 2. 골목상권별 시간대 분포
 
-if (selected_category != '선택해주세요') and (not df_w1.empty):
+if selected_category != '선택해주세요':
     filtered_df3_1_w1 = filtered_df_w1  # sk 수정
     
     # 시간대별 데이터 집계
@@ -315,7 +292,7 @@ if (selected_category != '선택해주세요') and (not df_w1.empty):
 #3-1. 주말
 
 # '선택하세요'가 아닌 유효한 지역이 선택된 경우에만 제목과 차트를 생성
-if (selected_category != '선택해주세요') and (not df_w2.empty):
+if selected_category != '선택해주세요':
     filtered_df_w2 = df_w2[df_w2['TYPE'] == selected_category]
     
 ### 성별 #############################################################
@@ -354,13 +331,12 @@ if (selected_category != '선택해주세요') and (not df_w2.empty):
         yaxis=dict(tickformat=',')  # y축 형식 지정
     )
     st.plotly_chart(fig2_1)
-elif (selected_category != '선택해주세요') and df_w2.empty:
-    st.header("3-2.주말(금~일)에 해당하는 데이터가 없습니다.")
+
     
 ###############################################################################
 # 2. 골목상권별 시간대 분포
 
-if (selected_category != '선택해주세요') and (not df_w2.empty):
+if selected_category != '선택해주세요':
     filtered_df3_1_w2 = filtered_df_w2  # sk 수정
     
     # 시간대별 데이터 집계
@@ -388,8 +364,6 @@ if (selected_category != '선택해주세요') and (not df_w2.empty):
 
 
 ###############################################################################
-
-st.sidebar.header("3. 유동인구 분석 (전체 vs 주중 vs 주말)")
 
 # 주중, 주말 라벨 추가
 df_w1['기간'] = '주중(월~목)'
@@ -444,11 +418,11 @@ def plot_stacked_time_chart(data, title):
 if selected_category != '선택해주세요':
     filtered_df = df_combined[df_combined['TYPE'] == selected_category]
     
-    st.header(f'유동인구 분석 - {selected_category} (전체 vs 주중 vs 주말)')
+    st.header(f'유동인구 분석 - {selected_category} (주중 vs 주말)')
     
     # 연령대별 차트
-    plot_combined_age_chart(filtered_df, f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 유동인구 연령대비율 - 전체 vs 주중 vs 주말')
+    plot_combined_age_chart(filtered_df, f'{selected_category}의 유동인구 연령대비율 - 전체 vs 주중 vs 주말')
     
     # 시간대별 차트
     filtered_df['time'] = pd.to_datetime(filtered_df['time'], format='%H:%M').dt.strftime('%H:%M')
-    plot_stacked_time_chart(filtered_df, f'<span style="color:blue; font-weight:bold">{selected_category}</span>의 시간대별 유동인구수 - 전체 vs 주중 vs 주말')
+    plot_stacked_time_chart(filtered_df, f'{selected_category}의 시간대별 유동인구수 - 전체 vs 주중 vs 주말')
